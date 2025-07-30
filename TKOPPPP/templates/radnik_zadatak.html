@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Radnik - Detalji zadatka</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    /* Osnovni stilovi za tijelo i pozadinu */
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background-color: #000000;
+      color: #e0e0e0;
+      position: relative;
+    }
+
+    /* Stilovi za pozadinsku animaciju zvijezdica */
+    .stars-background {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      background: none;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      background-color: #FFD700;
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: twinkle 4s infinite ease-in-out alternate;
+    }
+
+    /* Animacija treptanja zvijezdica */
+    @keyframes twinkle {
+      0% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+
+      100% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+    }
+
+    /* Stilovi za glavni kontejner sadržaja */
+    .container {
+      background: rgba(30, 30, 30, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 15px;
+      padding: 40px;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      box-shadow:
+        0 0 25px rgba(255, 215, 0, 0.6),
+        0 0 50px rgba(255, 215, 0, 0.4),
+        0 0 75px rgba(255, 215, 0, 0.2),
+        0 8px 30px rgba(0, 0, 0, 0.7);
+      max-width: 700px; /* Prilagođeno za ovu stranicu */
+      width: 90%;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      z-index: 1;
+    }
+
+    h1 {
+      color: #FFD700;
+      font-weight: 700;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      margin-bottom: 25px;
+      letter-spacing: 1px;
+      font-size: 2.5em;
+    }
+
+    .form-label {
+      color: #FFD700;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .form-control,
+    .form-select {
+      background-color: rgba(50, 50, 50, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 1.05em;
+      transition: all 0.3s ease;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+    }
+
+    .form-select {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23FFD700' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5L8 11L14 5'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 16px 12px;
+    }
+
+    .form-control::placeholder,
+    .form-select option {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      background-color: rgba(60, 60, 60, 0.9);
+      border-color: #FFD700;
+      box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.35);
+      color: #ffffff;
+    }
+
+    .form-control[readonly] {
+      background-color: rgba(70, 70, 70, 0.5);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #b0b0b0;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: #FFD700;
+      border-color: #FFD700;
+      padding: 15px 25px;
+      font-size: 1.2em;
+      font-weight: bold;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+      letter-spacing: 0.5px;
+      color: #1a1a2e;
+    }
+
+    .btn-primary:hover {
+      background-color: #E6B800;
+      border-color: #E6B800;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-primary:active {
+      background-color: #CC9900 !important;
+      border-color: #CC9900 !important;
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background-color: #6c757d;
+      border-color: #6c757d;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: #5a6268;
+      border-color: #545b62;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    #map {
+      height: 300px;
+      width: 100%;
+      margin-top: 20px;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    }
+
+    /* Stilovi za ocjenu */
+    .text-danger {
+      color: #dc3545 !important;
+    }
+
+    .text-warning {
+      color: #ffc107 !important;
+    }
+
+    .text-success {
+      color: #28a745 !important;
+    }
+
+    small.fw-bold {
+      display: block;
+      margin-top: 5px;
+      font-size: 0.9em;
+    }
+
+    /* Stilovi za poruke upozorenja (Flash Messages) */
+    .alert {
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 25px;
+      background-color: rgba(255, 215, 0, 0.2);
+      color: #FFD700;
+      border: 1px solid #FFD700;
+      display: none;
+      /* Skrivamo po defaultu, JS će prikazati ako nije animacija */
+    }
+
+    .alert-danger {
+      background-color: rgba(220, 53, 69, 0.8);
+      color: white;
+      border: none;
+      display: block;
+    }
+
+    /* --- Stilovi za pop-up animaciju (Uspjeh) --- */
+    .success-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease-in;
+    }
+
+    .success-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .success-overlay.hide {
+      opacity: 0;
+      transition: opacity 1s ease-out;
+      pointer-events: none;
+    }
+
+    .success-checkmark-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: #28a745;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: scaleUp 0.5s ease forwards;
+      box-shadow: 0 0 30px rgba(40, 167, 69, 0.8);
+    }
+
+    .success-checkmark-circle i {
+      color: white;
+      font-size: 60px;
+      font-weight: bold;
+    }
+
+    @keyframes scaleUp {
+      0% {
+        transform: scale(0);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="stars-background" id="stars-container"></div>
+
+  <div class="container">
+    <h1>Detalji zadatka</h1>
+    <a href="{{ url_for('radnik_dashboard') }}" class="btn btn-secondary mb-3">Natrag na vaše zadatke</a>
+
+    <form method="POST">
+      <div class="mb-3">
+        <label class="form-label">Naziv:</label>
+        <input type="text" class="form-control" value="{{ zadatak.naziv }}" readonly />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Opis:</label>
+        <textarea class="form-control" rows="3" readonly>{{ zadatak.opis }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Datum rada:</label>
+        <input type="date" class="form-control" value="{{ zadatak.datum }}" readonly />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Vrijeme rada:</label>
+        <input type="text" class="form-control" value="{{ zadatak.vrijeme }}" readonly />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Mjesto rada:</label>
+        <input type="text" class="form-control" value="{{ zadatak.mjesto }}" readonly />
+        <div id="map"></div>
+      </div>
+      <div class="mb-3">
+        <label for="status" class="form-label">Status:</label>
+        <select name="status" id="status" class="form-select" required>
+          <option value="NEODRAĐENO" {% if zadatak.status == 'NEODRAĐENO' %}selected{% endif %}>NEODRAĐENO</option>
+          <option value="U TOKU" {% if zadatak.status == 'U TOKU' %}selected{% endif %}>U TOKU</option>
+          <option value="ODRAĐENO" {% if zadatak.status == 'ODRAĐENO' %}selected{% endif %}>ODRAĐENO</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="radni_sati" class="form-label">Radni sati:</label>
+        <input type="text" name="radni_sati" id="radni_sati" class="form-control" value="{{ zadatak.radni_sati or '' }}"
+          placeholder="Upisati koliko je radnih sati odrađeno" />
+      </div>
+
+      {% if zadatak.status == 'NEODRAĐENO' %}
+      <div class="mb-3">
+        <label for="opis_zasto_nije" class="form-label">Razlog zašto nije odrađeno</label>
+        <textarea name="opis_zasto_nije" id="opis_zasto_nije" class="form-control" rows="3">{{ zadatak.opis_zasto_nije or '' }}</textarea>
+      </div>
+      {% else %}
+      <div class="mb-3">
+        <label class="form-label">Razlog zašto nije odrađeno:</label>
+        <textarea class="form-control" rows="3" readonly>{{ zadatak.opis_zasto_nije or '—' }}</textarea>
+      </div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label class="form-label">Ocjena:</label>
+        <input type="number" class="form-control fw-bold
+          {% if zadatak.ocjena is not none and zadatak.ocjena >= 1 and zadatak.ocjena <= 5 %}text-danger
+          {% elif zadatak.ocjena is not none and zadatak.ocjena >= 6 and zadatak.ocjena <= 7 %}text-warning
+          {% elif zadatak.ocjena is not none and zadatak.ocjena >= 8 and zadatak.ocjena <= 10 %}text-success
+          {% endif %}" value="{{ zadatak.ocjena or '—' }}" readonly />
+        {% if zadatak.ocjena is not none and zadatak.ocjena >= 1 and zadatak.ocjena <= 5 %}
+        <small class="text-danger fw-bold">Loše urađen posao</small>
+        {% elif zadatak.ocjena is not none and zadatak.ocjena >= 6 and zadatak.ocjena <= 7 %}
+        <small class="text-warning fw-bold">Može to i bolje</small>
+        {% elif zadatak.ocjena is not none and zadatak.ocjena >= 8 and zadatak.ocjena <= 10 %}
+        <small class="text-success fw-bold">Odlično odrađen posao</small>
+        {% endif %}
+        {% if zadatak.ocjena is none %}
+        <small class="text-muted fw-bold">Zadatak još nije ocijenjen.</small>
+        {% endif %}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Opis ocjene:</label>
+        <textarea class="form-control" rows="3" readonly>{{ zadatak.opis_ocjene or '—' }}</textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Spremi promjene</button>
+    </form>
+
+    <input type="hidden" id="changesSavedSuccess" value="{{ 'true' if get_flashed_messages() and get_flashed_messages()[0] == 'Promjene uspješno spremljene.' else 'false' }}">
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% if messages[0] != 'Promjene uspješno spremljene.' %}
+    <div id="flashMessageDisplay" class="alert alert-info mt-3">
+      {{ messages[0] }}
+    </div>
+    {% endif %}
+    {% endif %}
+    {% endwith %}
+  </div>
+
+  <div id="successOverlay" class="success-overlay">
+    <div class="success-checkmark-circle">
+      <i class="bi bi-check"></i>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Skripta za generiranje i animaciju zvijezdica
+    document.addEventListener('DOMContentLoaded', () => {
+      const starsContainer = document.getElementById('stars-container');
+      const numberOfStars = 100;
+
+      for (let i = 0; i < numberOfStars; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+
+        const size = Math.random() * 3 + 1;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+
+        star.style.animationDelay = `${Math.random() * 4}s`;
+        star.style.animationDuration = `${Math.random() * 3 + 2}s`;
+
+        starsContainer.appendChild(star);
+      }
+
+      // Funkcija za prikaz uspješne animacije
+      function showSuccessAnimation() {
+        const overlay = document.getElementById('successOverlay');
+        overlay.classList.add('show'); // Prikaži overlay
+
+        // Drži se vidljivim 3.5 sekunde, zatim započni skrivanje tijekom 1 sekunde
+        setTimeout(() => {
+          overlay.classList.add('hide'); // Započni skrivanje
+          setTimeout(() => {
+            overlay.classList.remove('show', 'hide'); // Potpuno ukloni klase nakon tranzicije
+          }, 1000); // Trajanje tranzicije hide klase (1 sekunda)
+        }, 3500); // Ukupno vrijeme prikaza prije početka skrivanja (3.5 sekundi)
+      }
+
+      // Provjeri skriveno polje za signal uspješnog spremanja promjena
+      const changesSavedSuccessInput = document.getElementById('changesSavedSuccess');
+      if (changesSavedSuccessInput && changesSavedSuccessInput.value === 'true') {
+        showSuccessAnimation();
+      } else {
+        // Ako postoji neka druga flash poruka, prikaži je
+        const flashMessageDisplay = document.getElementById('flashMessageDisplay');
+        if (flashMessageDisplay) {
+            flashMessageDisplay.style.display = 'block';
+        }
+      }
+    });
+
+    // Leaflet mapa skripta
+    window.onload = function () {
+      // Daj malo vremena da se DOM učita i stilovi primijene
+      setTimeout(() => {
+        var mjesto = "{{ zadatak.mjesto }}";
+        if (mjesto && mjesto.includes(',')) {
+          var coords = mjesto.split(',');
+          var lat = parseFloat(coords[0]);
+          var lng = parseFloat(coords[1]);
+
+          var map = L.map('map').setView([lat, lng], 13);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+          }).addTo(map);
+
+          L.marker([lat, lng]).addTo(map).bindPopup("Mjesto rada").openPopup();
+        } else {
+          document.getElementById('map').innerHTML = '<p class="text-muted text-center mt-3">Lokacija nije unesena ili nije ispravna.</p>';
+        }
+      }, 100); // Kratka odgoda
+    };
+  </script>
+</body>
+
+</html>

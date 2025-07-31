@@ -400,9 +400,9 @@
     });
 
     var map = L.map('map').setView([45.8, 16.0], 7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
+    L.tileLayer('https://tile.jawg.io/jawg-dark/{z}/{x}/{y}{r}.png?access-token=sD1XSfZEC8Q79v5rsxw5wQStUO6ScFRyeBk5lO2wXDmgU6tdF6M5TBrWx3iZNwgp', {
+      maxZoom: 22,
+      attribution: '<a href="https://www.jawg.io" target="_blank">© Jawg</a> contributors'
     }).addTo(map);
 
     var marker;

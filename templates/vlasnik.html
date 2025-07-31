@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <style>
+    /* Osnovni stilovi za tijelo i pozadinu */
     body {
       margin: 0;
       height: 100vh;
@@ -24,6 +25,7 @@
       position: relative;
     }
 
+    /* Stilovi za pozadinsku animaciju zvijezdica */
     .stars-background {
       position: fixed;
       width: 100%;
@@ -43,6 +45,7 @@
       animation: twinkle 4s infinite ease-in-out alternate;
     }
 
+    /* Animacija treptanja zvijezdica */
     @keyframes twinkle {
       0% {
         opacity: 0.5;
@@ -60,6 +63,7 @@
       }
     }
 
+    /* Stilovi za glavni kontejner sadržaja */
     .container {
       background: rgba(30, 30, 30, 0.85);
       backdrop-filter: blur(12px);
@@ -344,7 +348,8 @@
       </div>
       <div class="mb-3">
         <label for="mjesto" class="form-label">Mjesto rada (odaberi na karti):</label>
-        <input type="text" class="form-control" id="mjesto" name="mjesto" />
+        <!-- Sakriveno polje za spremanje koordinata -->
+        <input type="text" class="form-control" id="mjesto" name="mjesto" readonly />
         <div id="map"></div>
       </div>
       <button type="submit" class="btn btn-primary">DODAJ ZADATAK</button>
@@ -399,6 +404,7 @@
       }
     });
 
+    // Inicijalizacija mape i centriranje na Hrvatsku
     var map = L.map('map').setView([45.8, 16.0], 7);
     L.tileLayer('https://tile.jawg.io/jawg-dark/{z}/{x}/{y}{r}.png?access-token=sD1XSfZEC8Q79v5rsxw5wQStUO6ScFRyeBk5lO2wXDmgU6tdF6M5TBrWx3iZNwgp', {
       maxZoom: 22,
@@ -411,7 +417,7 @@
         map.removeLayer(marker);
       }
       marker = L.marker(e.latlng).addTo(map);
-      document.getElementById('mjesto').value = e.latlng.lat.toFixed(6) + ", " + e.latlng.lng.toFixed(6);
+      document.getElementById('mjesto').value = e.latlng.lat.toFixed(6) + "," + e.latlng.lng.toFixed(6);
     });
 
     window.onload = function () {

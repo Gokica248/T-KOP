@@ -76,7 +76,8 @@
         0 0 50px rgba(255, 215, 0, 0.4),
         0 0 75px rgba(255, 215, 0, 0.2),
         0 8px 30px rgba(0, 0, 0, 0.7);
-      max-width: 700px; /* Prilagođeno za ovu stranicu */
+      max-width: 700px;
+      /* Prilagođeno za ovu stranicu */
       width: 90%;
       position: relative;
       border: 1px solid rgba(255, 255, 255, 0.15);
@@ -219,7 +220,6 @@
       color: #FFD700;
       border: 1px solid #FFD700;
       display: none;
-      /* Skrivamo po defaultu, JS će prikazati ako nije animacija */
     }
 
     .alert-danger {
@@ -344,123 +344,109 @@
 
       <div class="mb-3">
         <label class="form-label">Ocjena:</label>
-        <input type="number" class="form-control fw-bold
-          {% if zadatak.ocjena is not none and zadatak.ocjena >= 1 and zadatak.ocjena <= 5 %}text-danger
-          {% elif zadatak.ocjena is not none and zadatak.ocjena >= 6 and zadatak.ocjena <= 7 %}text-warning
-          {% elif zadatak.ocjena is not none and zadatak.ocjena >= 8 and zadatak.ocjena <= 10 %}text-success
-          {% endif %}" value="{{ zadatak.ocjena or '—' }}" readonly />
-        {% if zadatak.ocjena is not none and zadatak.ocjena >= 1 and zadatak.ocjena <= 5 %}
-        <small class="text-danger fw-bold">Loše urađen posao</small>
-        {% elif zadatak.ocjena is not none and zadatak.ocjena >= 6 and zadatak.ocjena <= 7 %}
-        <small class="text-warning fw-bold">Može to i bolje</small>
-        {% elif zadatak.ocjena is not none and zadatak.ocjena >= 8 and zadatak.ocjena <= 10 %}
-        <small class="text-success fw-bold">Odlično odrađen posao</small>
-        {% endif %}
-        {% if zadatak.ocjena is none %}
-        <small class="text-muted fw-bold">Zadatak još nije ocijenjen.</small>
-        {% endif %}
+        <input type="number" class="form-control" value="{{ zadatak.ocjena }}" readonly />
+        <small class="fw-bold {% if zadatak.ocjena == 1 %}text-danger{% elif zadatak.ocjena == 2 %}text-warning{% elif zadatak.ocjena == 3 %}text-success{% endif %}">
+          {% if zadatak.ocjena == 1 %}Loše{% elif zadatak.ocjena == 2 %}Srednje{% elif zadatak.ocjena == 3 %}Dobro{% else %}Nema ocjene{% endif %}
+        </small>
       </div>
-
       <div class="mb-3">
         <label class="form-label">Opis ocjene:</label>
         <textarea class="form-control" rows="3" readonly>{{ zadatak.opis_ocjene or '—' }}</textarea>
       </div>
 
-      <button type="submit" class="btn btn-primary">Spremi promjene</button>
+      <button type="submit" class="btn btn-primary">SPREMI PROMJENE</button>
     </form>
-
-    <input type="hidden" id="changesSavedSuccess" value="{{ 'true' if get_flashed_messages() and get_flashed_messages()[0] == 'Promjene uspješno spremljene.' else 'false' }}">
 
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-    {% if messages[0] != 'Promjene uspješno spremljene.' %}
-    <div id="flashMessageDisplay" class="alert alert-info mt-3">
-      {{ messages[0] }}
-    </div>
-    {% endif %}
+    <div class="alert alert-info mt-3" id="flash-message">{{ messages[0] }}</div>
+    <script>
+      // Prikazi flash poruku pa je sakrij
+      document.addEventListener('DOMContentLoaded', () => {
+        const flashMessage = document.getElementById('flash-message');
+        if (flashMessage) {
+          flashMessage.style.display = 'block';
+          setTimeout(() => {
+            flashMessage.style.display = 'none';
+          }, 3000); // Poruka nestaje nakon 3 sekunde
+        }
+      });
+    </script>
     {% endif %}
     {% endwith %}
-  </div>
 
-  <div id="successOverlay" class="success-overlay">
-    <div class="success-checkmark-circle">
-      <i class="bi bi-check"></i>
+    <div id="successOverlay" class="success-overlay">
+      <div class="success-checkmark-circle">
+        <i class="bi bi-check-lg"></i>
+      </div>
     </div>
+
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // Skripta za generiranje i animaciju zvijezdica
     document.addEventListener('DOMContentLoaded', () => {
+      // Background stars
       const starsContainer = document.getElementById('stars-container');
       const numberOfStars = 100;
 
       for (let i = 0; i < numberOfStars; i++) {
         const star = document.createElement('div');
         star.classList.add('star');
-
         star.style.left = `${Math.random() * 100}%`;
         star.style.top = `${Math.random() * 100}%`;
-
         const size = Math.random() * 3 + 1;
         star.style.width = `${size}px`;
         star.style.height = `${size}px`;
-
         star.style.animationDelay = `${Math.random() * 4}s`;
         star.style.animationDuration = `${Math.random() * 3 + 2}s`;
-
         starsContainer.appendChild(star);
       }
 
-      // Funkcija za prikaz uspješne animacije
-      function showSuccessAnimation() {
-        const overlay = document.getElementById('successOverlay');
-        overlay.classList.add('show'); // Prikaži overlay
+      // Inicijalizacija mape za radnika - SADA INTERAKTIVNA
+      var map = L.map('map').setView([0, 0], 2);
 
-        // Drži se vidljivim 3.5 sekunde, zatim započni skrivanje tijekom 1 sekunde
-        setTimeout(() => {
-          overlay.classList.add('hide'); // Započni skrivanje
-          setTimeout(() => {
-            overlay.classList.remove('show', 'hide'); // Potpuno ukloni klase nakon tranzicije
-          }, 1000); // Trajanje tranzicije hide klase (1 sekunda)
-        }, 3500); // Ukupno vrijeme prikaza prije početka skrivanja (3.5 sekundi)
+      L.tileLayer('https://tile.jawg.io/jawg-dark/{z}/{x}/{y}{r}.png?access-token=sD1XSfZEC8Q79v5rsxw5wQStUO6ScFRyeBk5lO2wXDmgU6tdF6M5TBrWx3iZNwgp', {
+        maxZoom: 22,
+        attribution: '<a href="https://www.jawg.io" target="_blank">© Jawg</a> contributors'
+      }).addTo(map);
+
+      // Dohvati lokaciju iz Flask varijable
+      const locationData = "{{ zadatak.lokacija | default('') }}";
+      if (locationData) {
+          const latLngParts = locationData.split(',');
+          if (latLngParts.length === 2) {
+              const lat = parseFloat(latLngParts[0]);
+              const lng = parseFloat(latLngParts[1]);
+
+              if (!isNaN(lat) && !isNaN(lng)) {
+                  const latLng = [lat, lng];
+                  L.marker(latLng).addTo(map); // Dodaj marker na mapu
+                  map.setView(latLng, 13); // Centriraj mapu na lokaciju s većim zumom
+              }
+          }
       }
 
-      // Provjeri skriveno polje za signal uspješnog spremanja promjena
-      const changesSavedSuccessInput = document.getElementById('changesSavedSuccess');
-      if (changesSavedSuccessInput && changesSavedSuccessInput.value === 'true') {
-        showSuccessAnimation();
-      } else {
-        // Ako postoji neka druga flash poruka, prikaži je
-        const flashMessageDisplay = document.getElementById('flashMessageDisplay');
-        if (flashMessageDisplay) {
-            flashMessageDisplay.style.display = 'block';
-        }
+      // Onload event za invalidaciju veličine mape
+      window.onload = function () {
+        map.invalidateSize();
+      };
+
+      // Handle the success overlay for form submission
+      const flashMessage = document.getElementById('flash-message');
+      const successOverlay = document.getElementById('successOverlay');
+      if (flashMessage && flashMessage.innerText === 'Podaci uspješno spremljeni.') {
+        successOverlay.classList.add('show');
+        setTimeout(() => {
+          successOverlay.classList.add('hide');
+          successOverlay.addEventListener('transitionend', () => {
+            successOverlay.classList.remove('show', 'hide');
+          }, {
+            once: true
+          });
+        }, 2000); // Show for 2 seconds
       }
     });
-
-    // Leaflet mapa skripta
-    window.onload = function () {
-      // Daj malo vremena da se DOM učita i stilovi primijene
-      setTimeout(() => {
-        var mjesto = "{{ zadatak.mjesto }}";
-        if (mjesto && mjesto.includes(',')) {
-          var coords = mjesto.split(',');
-          var lat = parseFloat(coords[0]);
-          var lng = parseFloat(coords[1]);
-
-          var map = L.map('map').setView([lat, lng], 13);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
-          }).addTo(map);
-
-          L.marker([lat, lng]).addTo(map).bindPopup("Mjesto rada").openPopup();
-        } else {
-          document.getElementById('map').innerHTML = '<p class="text-muted text-center mt-3">Lokacija nije unesena ili nije ispravna.</p>';
-        }
-      }, 100); // Kratka odgoda
-    };
   </script>
 </body>
 

@@ -12,17 +12,30 @@
       "uloga": "radnik",
       "zadaci": [
         {
-          "naziv": "Kopanje bazena",
-          "opis": "5x5m",
-          "datum": "2025-07-20",
-          "vrijeme": "u 20:00h",
-          "mjesto": "43.418863, 17.285169",
-          "status": "ODRAĐENO",
-          "ocjena": 7,
-          "opis_ocjene": "gg",
+          "naziv": "adad",
+          "opis": "dada",
+          "datum": "2025-07-03",
+          "vrijeme": "u 5h",
+          "mjesto": "45.708217,16.397095",
+          "status": "NEODRAĐENO",
+          "ocjena": 0,
+          "opis_ocjene": "",
           "opis_zasto_nije": "",
           "radni_sati": 0,
-          "lokacija": ""
+          "lokacija": "45.708217,16.397095"
+        },
+        {
+          "naziv": "Kopanje",
+          "opis": "dadad",
+          "datum": "2025-07-17",
+          "vrijeme": "dadada",
+          "mjesto": "46.651439,14.035034",
+          "status": "NEODRAĐENO",
+          "ocjena": 0,
+          "opis_ocjene": "",
+          "opis_zasto_nije": "",
+          "radni_sati": 0,
+          "lokacija": "46.651439,14.035034"
         }
       ],
       "lokacija": {

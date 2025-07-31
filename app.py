@@ -7,15 +7,22 @@ app.secret_key = 'tajni_kljuc'  # Promijeni po potrebi
 
 DATA_FILE = 'podaci.json'
 
+
 def ucitaj_podatke():
+    """Učitava podatke iz JSON datoteke."""
     with open(DATA_FILE, 'r', encoding='utf-8') as f:
         return json.load(f)
 
+
 def spremi_podatke(podaci):
+    """Sprema podatke u JSON datoteku."""
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
         json.dump(podaci, f, indent=2, ensure_ascii=False)
 
+
 def login_required(rola):
+    """Dekorator za provjeru uloge korisnika."""
+
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
@@ -25,12 +32,16 @@ def login_required(rola):
                 flash('Nemate pristup ovoj stranici.')
                 return redirect(url_for('login'))
             return f(*args, **kwargs)
+
         return wrapper
+
     return decorator
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Ruta za prijavu korisnika."""
     if request.method == 'POST':
         korime = request.form['korime']
         lozinka = request.form['lozinka']
@@ -50,16 +61,18 @@ def login():
 
     return render_template('login.html')
 
+
 @app.route('/logout')
 def logout():
+    """Ruta za odjavu korisnika."""
     session.clear()
     return redirect(url_for('login'))
 
-# ----- Tvoj postojeći kod za vlasnik dashboard i ostale rute ----------
 
 @app.route('/vlasnik', methods=['GET', 'POST'])
 @login_required('vlasnik')
 def vlasnik_dashboard():
+    """Dashboard za vlasnika - dodavanje zadataka."""
     podaci = ucitaj_podatke()
     radnici = [k for k in podaci['korisnici'] if k['uloga'] == 'radnik']
 
@@ -70,7 +83,9 @@ def vlasnik_dashboard():
         datum = request.form.get('datum')
         vrijeme = request.form.get('vrijeme')
         mjesto = request.form.get('mjesto')
-        lokacija = request.form.get('lokacija')  # nova vrijednost
+
+        # Ispravljeno: uzimamo vrijednost iz polja 'mjesto' za lokaciju
+        lokacija = mjesto
 
         if not korisnik or not naziv:
             flash('Morate odabrati radnika i unijeti naziv zadatka.')
@@ -98,14 +113,16 @@ def vlasnik_dashboard():
         radnik.setdefault('zadaci', []).append(novi_zadatak)
         spremi_podatke(podaci)
 
-        # OVDE šaljemo poruku u template umjesto flash+redirect
+        # Šaljemo poruku u template umjesto flash+redirect
         return render_template('vlasnik.html', radnici=radnici, poruka="Zadatak je uspješno dodan.")
 
     return render_template('vlasnik.html', radnici=radnici)
 
+
 @app.route('/vlasnik/radnik/<korisnik>', methods=['GET', 'POST'])
 @login_required('vlasnik')
 def vlasnik_pregled_radnika(korisnik):
+    """Pregled zadataka za specifičnog radnika od strane vlasnika."""
     podaci = ucitaj_podatke()
     radnik = next((k for k in podaci['korisnici'] if k['korime'] == korisnik and k['uloga'] == 'radnik'), None)
     if radnik is None:
@@ -140,9 +157,11 @@ def vlasnik_pregled_radnika(korisnik):
 
     return render_template('vlasnik_pregled_radnika.html', radnik=radnik)
 
+
 @app.route('/radnik')
 @login_required('radnik')
 def radnik_dashboard():
+    """Dashboard za radnika - prikaz zadataka."""
     podaci = ucitaj_podatke()
     radnik = next((k for k in podaci['korisnici'] if k['korime'] == session['korisnik']), None)
     if radnik is None:
@@ -151,9 +170,11 @@ def radnik_dashboard():
 
     return render_template('radnik.html', radnik=radnik)
 
+
 @app.route('/radnik/zadatak/<int:indeks>', methods=['GET', 'POST'])
 @login_required('radnik')
 def radnik_zadatak(indeks):
+    """Prikaz i ažuriranje statusa pojedinog zadatka od strane radnika."""
     podaci = ucitaj_podatke()
     radnik = next((k for k in podaci['korisnici'] if k['korime'] == session['korisnik']), None)
     if radnik is None or indeks < 0 or indeks >= len(radnik.get('zadaci', [])):
@@ -183,8 +204,8 @@ def radnik_zadatak(indeks):
             zadatak['ocjena'] = 0
         else:
             zadatak['opis_zasto_nije'] = ''
-            if zadatak['ocjena'] == 1:
-                zadatak['ocjena'] = 1
+            # Ocjena se ne mijenja ovdje, već to radi vlasnik
+            pass
 
         spremi_podatke(podaci)
         flash('Podaci uspješno spremljeni.')
@@ -192,16 +213,15 @@ def radnik_zadatak(indeks):
 
     return render_template('radnik_zadatak.html', zadatak=zadatak, indeks=indeks)
 
-# --------- NOVO: Upravljanje radnicima -----------
 
 @app.route('/vlasnik/radnici', methods=['GET', 'POST'])
 @login_required('vlasnik')
 def vlasnik_upravljanje_radnicima():
+    """Upravljanje radnicima od strane vlasnika (dodavanje, brisanje, uređivanje)."""
     podaci = ucitaj_podatke()
     radnici = [k for k in podaci['korisnici'] if k['uloga'] == 'radnik']
 
     if request.method == 'POST':
-        # Dodavanje novog radnika
         if 'dodaj' in request.form:
             novo_korime = request.form.get('novo_korime', '').strip()
             nova_lozinka = request.form.get('nova_lozinka', '').strip()
@@ -218,14 +238,13 @@ def vlasnik_upravljanje_radnicima():
                 'lozinka': nova_lozinka,
                 'uloga': 'radnik',
                 'zadaci': [],
-                'lokacija': {"lat":0,"lng":0}
+                'lokacija': {"lat": 0, "lng": 0}
             }
             podaci['korisnici'].append(novi_radnik)
             spremi_podatke(podaci)
             flash(f'Radnik "{novo_korime}" uspješno dodan.')
             return redirect(url_for('vlasnik_upravljanje_radnicima'))
 
-        # Brisanje radnika
         elif 'obrisi' in request.form:
             korime_za_brisanje = request.form.get('korime_za_brisanje')
             if korime_za_brisanje:
@@ -236,7 +255,6 @@ def vlasnik_upravljanje_radnicima():
                 flash('Neispravan radnik za brisanje.')
             return redirect(url_for('vlasnik_upravljanje_radnicima'))
 
-        # Uređivanje radnika
         elif 'uredi' in request.form:
             stari_korime = request.form.get('stari_korime')
             novi_korime = request.form.get('novi_korime', '').strip()
@@ -250,12 +268,12 @@ def vlasnik_upravljanje_radnicima():
                 flash('Neispravan radnik za uređivanje.')
                 return redirect(url_for('vlasnik_upravljanje_radnicima'))
 
-            # Provjeri postoji li novi_korime već kod nekog drugog radnika
             if novi_korime != stari_korime and any(k['korime'] == novi_korime for k in podaci['korisnici']):
                 flash('Novo korisničko ime već postoji.')
                 return redirect(url_for('vlasnik_upravljanje_radnicima'))
 
-            radnik = next((k for k in podaci['korisnici'] if k['korime'] == stari_korime and k['uloga'] == 'radnik'), None)
+            radnik = next((k for k in podaci['korisnici'] if k['korime'] == stari_korime and k['uloga'] == 'radnik'),
+                          None)
             if radnik is None:
                 flash('Radnik ne postoji.')
                 return redirect(url_for('vlasnik_upravljanje_radnicima'))
@@ -267,6 +285,7 @@ def vlasnik_upravljanje_radnicima():
             return redirect(url_for('vlasnik_upravljanje_radnicima'))
 
     return render_template('vlasnik_upravljanje_radnicima.html', radnici=radnici)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

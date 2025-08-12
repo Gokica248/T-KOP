@@ -1,246 +1,492 @@
 <!DOCTYPE html>
+
 <html lang="hr">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Prijava</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-  <style>
-    /* Osnovni stilovi za tijelo i pozadinu */
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Moderniji font */
-      overflow: hidden; /* Sprečava scroll zbog zvijezdica */
-      background-color: #000000; /* Čisto crna pozadina */
-      color: #e0e0e0;
-      position: relative; /* Potrebno za pozicioniranje zvijezdica */
-    }
 
-    /* Stilovi za pozadinsku animaciju zvijezdica */
-    .stars-background {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      overflow: hidden; /* Skriva zvijezdice izvan ekrana */
-      background: none; /* Nema gradijenta, koristi čistu crnu pozadinu body-a */
-      z-index: -1; /* Osigurava da je iza sadržaja */
-    }
+<meta charset="UTF-8" />
 
-    .star {
-      position: absolute;
-      background-color: #FFD700; /* Zlatno-žute zvijezdice */
-      border-radius: 50%; /* Okrugle zvijezdice */
-      opacity: 0; /* Počinju nevidljive */
-      animation: twinkle 4s infinite ease-in-out alternate; /* Animacija treptanja */
-    }
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    /* Animacija treptanja zvijezdica */
-    @keyframes twinkle {
-      0% { opacity: 0; transform: scale(0.5); }
-      50% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(0.5); }
-    }
+<title>Prijava</title>
 
-    /* Stilovi za kontejner za prijavu */
-    .blur-container {
-      background: rgba(30, 30, 30, 0.85); /* Malo tamnija i manje prozirna pozadina */
-      backdrop-filter: blur(12px); /* Jače zamagljenje */
-      border-radius: 15px; /* Više zaobljeni rubovi */
-      padding: 40px;
-      /* box-shadow za još širi efekat svetlenja sa zlatno-žutom bojom */
-      box-shadow:
-        0 0 25px rgba(255, 215, 0, 0.6), /* Zlatno-žuti sjaj */
-        0 0 50px rgba(255, 215, 0, 0.4), /* Zlatno-žuti sjaj */
-        0 0 75px rgba(255, 215, 0, 0.2), /* Zlatno-žuti sjaj */
-        0 8px 30px rgba(0, 0, 0, 0.7); /* Postojeća tamna sjena za dubinu */
-      max-width: 450px; /* Malo širi kontejner */
-      width: 90%;
-      position: relative;
-      border: 1px solid rgba(255, 255, 255, 0.15); /* Jača svijetla granica */
-      z-index: 1; /* Iznad zvijezdica */
-    }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-    /* Stilovi za naslov */
-    .text-center {
-      color: #FFD700; /* Zlatno-žuti naslov */
-      margin-bottom: 35px; /* Više prostora ispod naslova */
-      font-size: 2.5em;
-      font-weight: 700; /* Podebljaniji */
-      letter-spacing: 1px; /* Razmak između slova */
-      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Mala sjena za naslov */
-    }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
-    /* Stilovi za labele (oznake) */
-    .form-label {
-      color: #FFD700; /* Zlatno-žute labele */
-      margin-bottom: 10px;
-      font-weight: 600; /* Podebljane labele */
-    }
+<style>
 
-    /* Stilovi za input polja */
-    .form-control {
-      background-color: rgba(50, 50, 50, 0.7); /* Malo svjetlija tamna pozadina */
-      border: 1px solid rgba(255, 255, 255, 0.3); /* Vidljivija svijetla granica */
-      color: #ffffff;
-      padding: 14px 18px; /* Više paddinga */
-      border-radius: 8px; /* Više zaobljeni rubovi */
-      font-size: 1.1em;
-      transition: all 0.3s ease; /* Glatkija tranzicija */
-    }
+/* Osnovni stilovi za tijelo i pozadinu */
 
-    .form-control::placeholder {
-      color: rgba(255, 255, 255, 0.6);
-    }
+body {
 
-    .form-control:focus {
-      background-color: rgba(60, 60, 60, 0.9); /* Još tamnije pri fokusu */
-      border-color: #FFD700; /* Zlatno-žuta granica pri fokusu */
-      box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.35); /* Zlatno-žuta sjena pri fokusu */
-      color: #ffffff;
-    }
+margin: 0;
 
-    /* Stilovi za dugme "Prijavi se" */
-    .btn-primary {
-      background-color: #FFD700; /* Zlatno-žuto dugme */
-      border-color: #FFD700;
-      padding: 15px 25px; /* Veći padding */
-      font-size: 1.2em;
-      font-weight: bold;
-      border-radius: 8px;
-      transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
-      letter-spacing: 0.5px;
-      color: #1a1a2e; /* Tamna boja teksta za kontrast */
-    }
+height: 100vh;
 
-    .btn-primary:hover {
-      background-color: #E6B800; /* Tamnija zlatno-žuta pri hoveru */
-      border-color: #E6B800;
-      transform: translateY(-3px); /* Izraženiji efekt pri hoveru */
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4); /* Sjena pri hoveru */
-    }
+display: flex;
 
-    .btn-primary:active {
-      background-color: #CC9900 !important; /* Još tamnija pri kliku */
-      border-color: #CC9900 !important;
-      transform: translateY(0);
-      box-shadow: none;
-    }
+justify-content: center;
 
-    /* Stilovi za omotač lozinke i ikonu */
-    .password-wrapper {
-      position: relative;
-    }
+align-items: center;
 
-    #lozinka {
-      padding-right: 50px; /* Više prostora za ikonu */
-    }
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Moderniji font */
 
-    .password-toggle {
-      position: absolute;
-      right: 18px; /* Još malo desno */
-      bottom: 12px; /* Centrirano vertikalno */
-      cursor: pointer;
-      color: #b0b0b0; /* Svjetlija siva boja za ikonu */
-      font-size: 24px; /* Veća ikona */
-      user-select: none;
-      transition: color 0.3s ease;
-    }
+overflow: hidden; /* Sprečava scroll zbog zvijezdica */
 
-    .password-toggle:hover {
-      color: #FFD700; /* Zlatno-žuta ikona pri hoveru */
-    }
+background-color: #000000; /* Čisto crna pozadina */
 
-    /* Stilovi za poruke upozorenja (Flash Messages) */
-    .alert {
-        border-radius: 8px;
-        font-weight: bold;
-        text-align: center;
-        margin-top: 25px; /* Više prostora iznad poruke */
-        background-color: rgba(220, 53, 69, 0.8); /* Crvena boja sa malo prozirnosti */
-        color: white;
-        border: none;
-    }
-  </style>
+color: #e0e0e0;
+
+position: relative; /* Potrebno za pozicioniranje zvijezdica */
+
+}
+
+
+
+/* Stilovi za pozadinsku animaciju zvijezdica */
+
+.stars-background {
+
+position: absolute;
+
+width: 100%;
+
+height: 100%;
+
+top: 0;
+
+left: 0;
+
+overflow: hidden; /* Skriva zvijezdice izvan ekrana */
+
+background: none; /* Nema gradijenta, koristi čistu crnu pozadinu body-a */
+
+z-index: -1; /* Osigurava da je iza sadržaja */
+
+}
+
+
+
+.star {
+
+position: absolute;
+
+background-color: #FFD700; /* Zlatno-žute zvijezdice */
+
+border-radius: 50%; /* Okrugle zvijezdice */
+
+opacity: 0; /* Počinju nevidljive */
+
+animation: twinkle 4s infinite ease-in-out alternate; /* Animacija treptanja */
+
+}
+
+
+
+/* Animacija treptanja zvijezdica */
+
+@keyframes twinkle {
+
+0% { opacity: 0; transform: scale(0.5); }
+
+50% { opacity: 1; transform: scale(1); }
+
+100% { opacity: 0; transform: scale(0.5); }
+
+}
+
+
+
+/* Stilovi za kontejner za prijavu */
+
+.blur-container {
+
+background: rgba(30, 30, 30, 0.85); /* Malo tamnija i manje prozirna pozadina */
+
+backdrop-filter: blur(12px); /* Jače zamagljenje */
+
+border-radius: 15px; /* Više zaobljeni rubovi */
+
+padding: 40px;
+
+/* box-shadow za još širi efekat svetlenja sa zlatno-žutom bojom */
+
+box-shadow:
+
+0 0 25px rgba(255, 215, 0, 0.6), /* Zlatno-žuti sjaj */
+
+0 0 50px rgba(255, 215, 0, 0.4), /* Zlatno-žuti sjaj */
+
+0 0 75px rgba(255, 215, 0, 0.2), /* Zlatno-žuti sjaj */
+
+0 8px 30px rgba(0, 0, 0, 0.7); /* Postojeća tamna sjena za dubinu */
+
+max-width: 450px; /* Malo širi kontejner */
+
+width: 90%;
+
+position: relative;
+
+border: 1px solid rgba(255, 255, 255, 0.15); /* Jača svijetla granica */
+
+z-index: 1; /* Iznad zvijezdica */
+
+}
+
+
+
+/* Stilovi za naslov */
+
+.text-center {
+
+color: #FFD700; /* Zlatno-žuti naslov */
+
+margin-bottom: 35px; /* Više prostora ispod naslova */
+
+font-size: 2.5em;
+
+font-weight: 700; /* Podebljaniji */
+
+letter-spacing: 1px; /* Razmak između slova */
+
+text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Mala sjena za naslov */
+
+}
+
+
+
+/* Stilovi za labele (oznake) */
+
+.form-label {
+
+color: #FFD700; /* Zlatno-žute labele */
+
+margin-bottom: 10px;
+
+font-weight: 600; /* Podebljane labele */
+
+}
+
+
+
+/* Stilovi za input polja */
+
+.form-control {
+
+background-color: rgba(50, 50, 50, 0.7); /* Malo svjetlija tamna pozadina */
+
+border: 1px solid rgba(255, 255, 255, 0.3); /* Vidljivija svijetla granica */
+
+color: #ffffff;
+
+padding: 14px 18px; /* Više paddinga */
+
+border-radius: 8px; /* Više zaobljeni rubovi */
+
+font-size: 1.1em;
+
+transition: all 0.3s ease; /* Glatkija tranzicija */
+
+}
+
+
+
+.form-control::placeholder {
+
+color: rgba(255, 255, 255, 0.6);
+
+}
+
+
+
+.form-control:focus {
+
+background-color: rgba(60, 60, 60, 0.9); /* Još tamnije pri fokusu */
+
+border-color: #FFD700; /* Zlatno-žuta granica pri fokusu */
+
+box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.35); /* Zlatno-žuta sjena pri fokusu */
+
+color: #ffffff;
+
+}
+
+
+
+/* Stilovi za dugme "Prijavi se" */
+
+.btn-primary {
+
+background-color: #FFD700; /* Zlatno-žuto dugme */
+
+border-color: #FFD700;
+
+padding: 15px 25px; /* Veći padding */
+
+font-size: 1.2em;
+
+font-weight: bold;
+
+border-radius: 8px;
+
+transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+
+letter-spacing: 0.5px;
+
+color: #1a1a2e; /* Tamna boja teksta za kontrast */
+
+}
+
+
+
+.btn-primary:hover {
+
+background-color: #E6B800; /* Tamnija zlatno-žuta pri hoveru */
+
+border-color: #E6B800;
+
+transform: translateY(-3px); /* Izraženiji efekt pri hoveru */
+
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4); /* Sjena pri hoveru */
+
+}
+
+
+
+.btn-primary:active {
+
+background-color: #CC9900 !important; /* Još tamnija pri kliku */
+
+border-color: #CC9900 !important;
+
+transform: translateY(0);
+
+box-shadow: none;
+
+}
+
+
+
+/* Stilovi za omotač lozinke i ikonu */
+
+.password-wrapper {
+
+position: relative;
+
+}
+
+
+
+#lozinka {
+
+padding-right: 50px; /* Više prostora za ikonu */
+
+}
+
+
+
+.password-toggle {
+
+position: absolute;
+
+right: 18px; /* Još malo desno */
+
+bottom: 12px; /* Centrirano vertikalno */
+
+cursor: pointer;
+
+color: #b0b0b0; /* Svjetlija siva boja za ikonu */
+
+font-size: 24px; /* Veća ikona */
+
+user-select: none;
+
+transition: color 0.3s ease;
+
+}
+
+
+
+.password-toggle:hover {
+
+color: #FFD700; /* Zlatno-žuta ikona pri hoveru */
+
+}
+
+
+
+/* Stilovi za poruke upozorenja (Flash Messages) */
+
+.alert {
+
+border-radius: 8px;
+
+font-weight: bold;
+
+text-align: center;
+
+margin-top: 25px; /* Više prostora iznad poruke */
+
+background-color: rgba(220, 53, 69, 0.8); /* Crvena boja sa malo prozirnosti */
+
+color: white;
+
+border: none;
+
+}
+
+</style>
+
 </head>
 
+
+
 <body>
-  <div class="stars-background" id="stars-container"></div>
 
-  <div class="blur-container">
-    <h2 class="text-center">PRIJAVA</h2>
-    <form method="POST" action="{{ url_for('login') }}">
-      <div class="mb-3">
-        <label for="korime" class="form-label">Korisničko ime</label>
-        <input type="text" class="form-control" id="korime" name="korime" required />
-      </div>
-      <div class="mb-3 password-wrapper">
-        <label for="lozinka" class="form-label">Lozinka</label>
-        <input type="password" class="form-control" id="lozinka" name="lozinka" required />
-        <span class="password-toggle" onclick="togglePassword()" title="Prikaži / Sakrij lozinku" role="button" tabindex="0" onkeydown="if(event.key==='Enter' || event.key===' ') togglePassword()">
-          <i id="eyeIcon" class="bi bi-eye-slash"></i>
-        </span>
-      </div>
-      <button type="submit" class="btn btn-primary w-100">Prijavi se</button>
-    </form>
+<div class="stars-background" id="stars-container"></div>
 
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <div class="alert alert-danger mt-3">{{ messages[0] }}</div>
-    {% endif %}
-    {% endwith %}
-  </div>
 
-  <script>
-    // Funkcija za prikaz/sakrivanje lozinke
-    function togglePassword() {
-      const input = document.getElementById("lozinka");
-      const icon = document.getElementById("eyeIcon");
 
-      if (input.type === "password") {
-        input.type = "text";
-        icon.classList.remove("bi-eye-slash");
-        icon.classList.add("bi-eye");
-      } else {
-        input.type = "password";
-        icon.classList.remove("bi-eye");
-        icon.classList.add("bi-eye-slash");
-      }
-    }
+<div class="blur-container">
 
-    // Skripta za generiranje i animaciju zvijezdica
-    document.addEventListener('DOMContentLoaded', () => {
-      const starsContainer = document.getElementById('stars-container');
-      const numberOfStars = 100; // Broj zvijezdica
+<h2 class="text-center">PRIJAVA</h2>
 
-      for (let i = 0; i < numberOfStars; i++) {
-        const star = document.createElement('div');
-        star.classList.add('star');
+<form method="POST" action="{{ url_for('login') }}">
 
-        // Nasumične pozicije
-        star.style.left = `${Math.random() * 100}%`;
-        star.style.top = `${Math.random() * 100}%`;
+<div class="mb-3">
 
-        // Nasumične veličine
-        const size = Math.random() * 3 + 1; // Zvijezdice od 1px do 4px
-        star.style.width = `${size}px`;
-        star.style.height = `${size}px`;
+<label for="korime" class="form-label">Korisničko ime</label>
 
-        // Nasumično kašnjenje animacije za raznolikost
-        star.style.animationDelay = `${Math.random() * 4}s`;
+<input type="text" class="form-control" id="korime" name="korime" required />
 
-        // Nasumično trajanje animacije za raznolikost
-        star.style.animationDuration = `${Math.random() * 3 + 2}s`; // 2s do 5s
+</div>
 
-        starsContainer.appendChild(star);
-      }
-    });
-  </script>
+<div class="mb-3 password-wrapper">
+
+<label for="lozinka" class="form-label">Lozinka</label>
+
+<input type="password" class="form-control" id="lozinka" name="lozinka" required />
+
+<span class="password-toggle" onclick="togglePassword()" title="Prikaži / Sakrij lozinku" role="button" tabindex="0" onkeydown="if(event.key==='Enter' || event.key===' ') togglePassword()">
+
+<i id="eyeIcon" class="bi bi-eye-slash"></i>
+
+</span>
+
+</div>
+
+<button type="submit" class="btn btn-primary w-100">Prijavi se</button>
+
+</form>
+
+
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<div class="alert alert-danger mt-3">{{ messages[0] }}</div>
+
+{% endif %}
+
+{% endwith %}
+
+</div>
+
+
+
+<script>
+
+// Funkcija za prikaz/sakrivanje lozinke
+
+function togglePassword() {
+
+const input = document.getElementById("lozinka");
+
+const icon = document.getElementById("eyeIcon");
+
+
+
+if (input.type === "password") {
+
+input.type = "text";
+
+icon.classList.remove("bi-eye-slash");
+
+icon.classList.add("bi-eye");
+
+} else {
+
+input.type = "password";
+
+icon.classList.remove("bi-eye");
+
+icon.classList.add("bi-eye-slash");
+
+}
+
+}
+
+
+
+// Skripta za generiranje i animaciju zvijezdica
+
+document.addEventListener('DOMContentLoaded', () => {
+
+const starsContainer = document.getElementById('stars-container');
+
+const numberOfStars = 100; // Broj zvijezdica
+
+
+
+for (let i = 0; i < numberOfStars; i++) {
+
+const star = document.createElement('div');
+
+star.classList.add('star');
+
+
+
+// Nasumične pozicije
+
+star.style.left = `${Math.random() * 100}%`;
+
+star.style.top = `${Math.random() * 100}%`;
+
+
+
+// Nasumične veličine
+
+const size = Math.random() * 3 + 1; // Zvijezdice od 1px do 4px
+
+star.style.width = `${size}px`;
+
+star.style.height = `${size}px`;
+
+
+
+// Nasumično kašnjenje animacije za raznolikost
+
+star.style.animationDelay = `${Math.random() * 4}s`;
+
+
+
+// Nasumično trajanje animacije za raznolikost
+
+star.style.animationDuration = `${Math.random() * 3 + 2}s`; // 2s do 5s
+
+
+
+starsContainer.appendChild(star);
+
+}
+
+});
+
+</script>
+
 </body>
+
 </html>
+

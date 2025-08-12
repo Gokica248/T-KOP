@@ -17,30 +17,54 @@
           "datum": "2025-07-03",
           "vrijeme": "u 5h",
           "mjesto": "45.708217,16.397095",
-          "status": "NEODRAĐENO",
-          "ocjena": 0,
-          "opis_ocjene": "",
+          "status": "ODRAĐENO",
+          "ocjena": 4,
+          "opis_ocjene": "gg",
           "opis_zasto_nije": "",
           "radni_sati": 0,
           "lokacija": "45.708217,16.397095"
         },
         {
           "naziv": "Kopanje",
-          "opis": "dadad",
-          "datum": "2025-07-17",
-          "vrijeme": "dadada",
-          "mjesto": "46.651439,14.035034",
+          "opis": "ddd",
+          "datum": "2025-08-21",
+          "vrijeme": "u 5h",
+          "mjesto": "42.198544,20.716095",
           "status": "NEODRAĐENO",
-          "ocjena": 0,
-          "opis_ocjene": "",
+          "ocjena": 10,
+          "opis_ocjene": "gg",
           "opis_zasto_nije": "",
-          "radni_sati": 0,
-          "lokacija": "46.651439,14.035034"
+          "radni_sati": 5.0,
+          "lokacija": "42.198544,20.716095"
         }
       ],
       "lokacija": {
-        "lat": 72.062918,
-        "lng": 322.03125
+        "lat": 45.0,
+        "lng": 16.0
+      }
+    },
+    {
+      "korime": "mate",
+      "lozinka": "mate",
+      "uloga": "radnik",
+      "zadaci": [
+        {
+          "naziv": "Kopanje1",
+          "opis_zadatka": "dd",
+          "datum": "2025-07-30",
+          "vrijeme_zadatka": "u 15h",
+          "mjesto": "45.884392,15.968628",
+          "status": "NEODRAĐENO",
+          "ocjena": 5,
+          "opis_ocjene": "gg",
+          "opis_zasto_nije": "",
+          "radni_sati": 5.0,
+          "lokacija": "45.884392,15.968628"
+        }
+      ],
+      "lokacija": {
+        "lat": 0,
+        "lng": 0
       }
     }
   ]
